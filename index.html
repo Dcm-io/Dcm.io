@@ -1,25 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DCM - Digital Content Management</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 800px;
-      margin: 2rem auto;
-      padding: 0 20px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DCM.io</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: bgChange 15s infinite;
+            font-family: Arial, sans-serif;
+        }
+
+        .welcome-text {
+            font-size: 4rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .welcome-text span {
+            opacity: 0;
+            display: inline-block;
+            animation: letterAppear 0.5s forwards;
+        }
+
+        @keyframes bgChange {
+            0% { background-color: #2ecc71; }
+            33% { background-color: #27ae60; }
+            66% { background-color: #229954; }
+            100% { background-color: #2ecc71; }
+        }
+
+        @keyframes letterAppear {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .welcome-text {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h1>Welcome to DCM.io</h1>
-  <p>Professional Digital Content Solutions</p>
-  <ul>
-    <li>Content Strategy</li>
-    <li>Digital Asset Management</li>
-    <li>Workflow Optimization</li>
-  </ul>
+    <div class="welcome-text" id="welcome"></div>
+
+    <script>
+        const text = "Welcome to Dcm.io";
+        const welcomeElement = document.getElementById('welcome');
+        
+        text.split('').forEach((char, index) => {
+            const span = document.createElement('span');
+            span.textContent = char;
+            span.style.animationDelay = `${index * 0.2}s`;
+            welcomeElement.appendChild(span);
+            
+            // Add space after each word
+            if (text[index] === ' ' && text[index + 1] !== ' ') {
+                welcomeElement.appendChild(document.createTextNode('\u00A0'));
+            }
+        });
+    </script>
 </body>
 </html>
