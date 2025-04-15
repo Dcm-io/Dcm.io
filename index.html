@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DCM.io</title>
+    <title>DCM.io - File Upload</title>
     <style>
         body {
             margin: 0;
@@ -14,6 +14,8 @@
             align-items: center;
             animation: bgChange 15s infinite;
             font-family: Arial, sans-serif;
+            transition: all 1s ease;
+            position: relative;
         }
 
         .welcome-text {
@@ -21,12 +23,51 @@
             font-weight: bold;
             color: white;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            position: absolute;
+            opacity: 1;
+            transition: opacity 1s ease;
         }
 
-        .welcome-text span {
+        .upload-container {
             opacity: 0;
-            display: inline-block;
-            animation: letterAppear 0.5s forwards;
+            transform: translateY(20px);
+            transition: all 1s ease;
+            text-align: center;
+        }
+
+        .show-upload {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .upload-box {
+            background: rgba(255,255,255,0.9);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        }
+
+        input[type="file"] {
+            margin: 20px 0;
+            padding: 15px;
+            border: 2px dashed #27ae60;
+            border-radius: 5px;
+            width: 300px;
+        }
+
+        button {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #229954;
         }
 
         @keyframes bgChange {
@@ -34,6 +75,12 @@
             33% { background-color: #27ae60; }
             66% { background-color: #229954; }
             100% { background-color: #2ecc71; }
+        }
+
+        .welcome-text span {
+            opacity: 0;
+            display: inline-block;
+            animation: letterAppear 0.5s forwards;
         }
 
         @keyframes letterAppear {
@@ -46,18 +93,22 @@
                 transform: translateY(0);
             }
         }
-
-        @media (max-width: 768px) {
-            .welcome-text {
-                font-size: 2.5rem;
-            }
-        }
     </style>
 </head>
 <body>
     <div class="welcome-text" id="welcome"></div>
+    <div class="upload-container" id="uploadContainer">
+        <div class="upload-box">
+            <h2>Upload Excel File</h2>
+            <p>Supported formats: .xls, .xlsx</p>
+            <input type="file" id="excelUpload" accept=".xls,.xlsx">
+            <br>
+            <button onclick="handleUpload()">Process File</button>
+        </div>
+    </div>
 
     <script>
+        // Welcome text animation
         const text = "Welcome to Dcm.io";
         const welcomeElement = document.getElementById('welcome');
         
@@ -66,11 +117,48 @@
             span.textContent = char;
             span.style.animationDelay = `${index * 0.2}s`;
             welcomeElement.appendChild(span);
+        });
+
+        // Transition to upload form after animation
+        setTimeout(() => {
+            welcomeElement.style.opacity = '0';
+            document.getElementById('uploadContainer').classList.add('show-upload');
+        }, text.length * 200 + 3000); // Wait for animation + 3 seconds
+
+        // File upload handling
+        function handleUpload() {
+            const fileInput = document.getElementById('excelUpload');
+            const file = fileInput.files[0];
             
-            // Add space after each word
-            if (text[index] === ' ' && text[index + 1] !== ' ') {
-                welcomeElement.appendChild(document.createTextNode('\u00A0'));
+            if (file) {
+                if (file.name.match(/\.(xls|xlsx)$/)) {
+                    // Add your file processing logic here
+                    alert('File received: ' + file.name);
+                } else {
+                    alert('Please upload an Excel file (.xls or .xlsx)');
+                }
+            } else {
+                alert('Please select a file first');
             }
+        }
+
+        // Drag and drop handling
+        const dropZone = document.body;
+        
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.background = 'rgba(0,0,0,0.1)';
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.style.background = '';
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.background = '';
+            const file = e.dataTransfer.files[0];
+            if (file) document.getElementById('excelUpload').files = e.dataTransfer.files;
         });
     </script>
 </body>
