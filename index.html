@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DCM.io - File Upload</title>
+    <title>DCM.io - Email Generator</title>
     <style>
         body {
             margin: 0;
@@ -83,6 +83,12 @@
             animation: letterAppear 0.5s forwards;
         }
 
+        #result {
+            margin-top: 20px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+
         @keyframes letterAppear {
             from {
                 opacity: 0;
@@ -104,6 +110,7 @@
             <input type="file" id="excelUpload" accept=".xls,.xlsx">
             <br>
             <button onclick="handleUpload()">Process File</button>
+            <div id="result"></div>
         </div>
     </div>
 
@@ -123,7 +130,7 @@
         setTimeout(() => {
             welcomeElement.style.opacity = '0';
             document.getElementById('uploadContainer').classList.add('show-upload');
-        }, text.length * 200 + 3000); // Wait for animation + 3 seconds
+        }, text.length * 200 + 3000);
 
         // File upload handling
         function handleUpload() {
@@ -132,13 +139,30 @@
             
             if (file) {
                 if (file.name.match(/\.(xls|xlsx)$/)) {
-                    // Add your file processing logic here
-                    alert('File received: ' + file.name);
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const byteArray = new Uint8Array(e.target.result);
+                        document.getElementById('result').innerHTML = "Processing...";
+
+                        google.script.run
+                            .withSuccessHandler(url => {
+                                document.getElementById('result').innerHTML = 
+                                    `<a href="${url}" target="_blank" style="color: #27ae60; text-decoration: none;">Download Results</a>`;
+                            })
+                            .withFailureHandler(err => {
+                                document.getElementById('result').innerHTML = 
+                                    `<span style="color: #e74c3c;">Error: ${err.message}</span>`;
+                            })
+                            .processExcelUpload(byteArray);
+                    };
+                    reader.readAsArrayBuffer(file);
                 } else {
-                    alert('Please upload an Excel file (.xls or .xlsx)');
+                    document.getElementById('result').innerHTML = 
+                        '<span style="color: #e74c3c;">Please upload an Excel file (.xls or .xlsx)</span>';
                 }
             } else {
-                alert('Please select a file first');
+                document.getElementById('result').innerHTML = 
+                    '<span style="color: #e74c3c;">Please select a file first</span>';
             }
         }
 
@@ -158,7 +182,10 @@
             e.preventDefault();
             dropZone.style.background = '';
             const file = e.dataTransfer.files[0];
-            if (file) document.getElementById('excelUpload').files = e.dataTransfer.files;
+            if (file) {
+                document.getElementById('excelUpload').files = e.dataTransfer.files;
+                document.getElementById('result').innerHTML = '';
+            }
         });
     </script>
 </body>
